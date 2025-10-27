@@ -30,6 +30,15 @@ def test_multiple_intervals_overlap():
     assert result == expected, f"Expected {expected}, got {result}"
 
 
+def test_touching_time_ranges_no_overlap():
+    range1 = time_range("2010-01-12 10:00:00", "2010-01-12 10:30:00")
+    range2 = time_range("2010-01-12 10:30:00", "2010-01-12 11:00:00")
+
+    expected = []  # No overlap because they only touch
+    result = compute_overlap_time(range1, range2)
+
+    assert result == expected, f"Expected no overlap, got {result}"
+
 
 def test_backwards_time_range_raises_value_error():
     with pytest.raises(ValueError, match="end_time .* must be after start_time .*"):
