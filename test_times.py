@@ -1,4 +1,5 @@
 from times import compute_overlap_time, time_range
+import pytest
 
 def test_generic_case():
     large = time_range("2010-01-12 10:00:00", "2010-01-12 12:00:00")
@@ -15,14 +16,21 @@ def test_no_overlap():
     
 
 def test_multiple_intervals_overlap():
-    range1 = time_range("2010-01-12 10:00:00", "2010-01-12 12:00:00", 4)  # Range 1: 10:00 - 12:00, 4 intervals
-    range2 = time_range("2010-01-12 10:30:00", "2010-01-12 11:30:00", 3)  # Range 2: 10:30 - 11:30, 3 intervals
-    
+    range1 = time_range("2010-01-12 10:00:00", "2010-01-12 12:00:00", 4)
+    range2 = time_range("2010-01-12 10:30:00", "2010-01-12 11:30:00", 3)
+
     expected = [
-        ("2010-01-12 10:30:00", "2010-01-12 10:37:00"),  # 1st overlap
-        ("2010-01-12 10:38:00", "2010-01-12 10:45:00"),  # 2nd overlap
-        ("2010-01-12 10:45:00", "2010-01-12 10:52:00"),  # 3rd overlap
-        ("2010-01-12 10:53:00", "2010-01-12 11:00:00")   # 4th overlap
+        ("2010-01-12 10:30:00", "2010-01-12 10:50:00"),
+        ("2010-01-12 10:50:00", "2010-01-12 11:00:00"),
+        ("2010-01-12 11:00:00", "2010-01-12 11:10:00"),
+        ("2010-01-12 11:10:00", "2010-01-12 11:30:00"),
     ]
-    
-    assert compute_overlap_time(range1, range2) == expected
+
+    result = compute_overlap_time(range1, range2)
+    assert result == expected, f"Expected {expected}, got {result}"
+
+
+
+def test_backwards_time_range_raises_value_error():
+    with pytest.raises(ValueError, match="end_time .* must be after start_time .*"):
+        time_range("2010-01-12 12:00:00", "2010-01-12 10:00:00")
